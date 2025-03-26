@@ -96,6 +96,9 @@ This server implements the Model Context Protocol to expose Shodan's powerful in
 
 ### Using the MCP Inspector
 
+![image](https://github.com/user-attachments/assets/81c5a0d8-c105-4a47-97ee-2905aa5bb6bc)
+
+
 You can use the MCP inspector to interact with the server directly:
 
 1. Install the MCP inspector:
