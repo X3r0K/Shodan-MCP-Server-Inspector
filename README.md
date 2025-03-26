@@ -1,196 +1,156 @@
-# shodan-mcp-server
+# Shodan MCP Server
 
-This is a Model Context Protocol (MCP) server that provides access to the Shodan API. It allows you to programmatically query Shodan for information about devices, vulnerabilities, and more.
+A Model Context Protocol (MCP) server that provides access to Shodan's internet scanning capabilities through a standardized interface.
 
-## Table of Contents
+## Overview
 
-- [Introduction](#introduction)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage with Node.js](#usage-with-nodejs)
-- [API Documentation](#api-documentation)
-  - [get_ip_info](#get_ip_info)
-  - [dns_lookup](#dns_lookup)
-  - [get_vulnerabilities](#get_vulnerabilities)
-  - [cve_info](#cve_info)
-  - [search](#search)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Introduction
-
-The `shodan-mcp-server` provides a simple way to integrate Shodan intelligence into your applications using the Model Context Protocol (MCP). It exposes several tools that allow you to query Shodan for various types of information.
+This server implements the Model Context Protocol to expose Shodan's powerful internet scanning and reconnaissance capabilities. It provides a standardized interface for querying Shodan's database of internet-connected devices, services, and vulnerabilities.
 
 ## Features
 
-Host Information: Get detailed information about an IP address
-Search: Query Shodan's database using their search syntax
-DNS Lookup: Resolve domain names
-CVE Information: Get details about specific CVE vulnerabilities
+- **Search Capabilities**: Query Shodan's database using advanced search filters
+- **DNS Lookup**: Resolve domain names and get detailed DNS information
+- **CVE Information**: Get detailed information about Common Vulnerabilities and Exposures
+- **Get Vulnerabilities**: Get detailed infor Vulnerabilities related to an IP address
+- **Standardized Interface**: Uses MCP protocol for consistent communication
+- **Environment Variable Support**: Secure API key management through environment variables
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+- Shodan API key
 
 ## Installation
 
-1.  Clone the repository:
+1. Clone the repository:
 
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/yourusername/shodan-mcp-server.git
     cd shodan-mcp-server
     ```
 
-2.  Install the dependencies:
+2. Install dependencies:
 
     ```bash
     npm install
     ```
 
-3.  Build the project:
+3. Create a `.env.local` file in the root directory and add your Shodan API key:
+
+    ```bash
+    SHODAN_API_KEY=your_api_key_here
+    ```
+
+## Usage
+
+### Starting the Server
+
+1. Build the server:
 
     ```bash
     npm run build
     ```
 
-## Configuration
-
-1.  Obtain a Shodan API key from [Shodan](https://account.shodan.io/).
-2.  Configure the MCP server in your MCP settings file (e.g., `~/.config/mcp/settings.json`):
-
-    ```json
-    {
-      "mcpServers": {
-        "shodan": {
-          "command": "node",
-          "args": ["/path/to/shodan-mcp-server/build/index.js"],
-          "env": {
-            "SHODAN_API_KEY": "<your_shodan_api_key>"
-          },
-          "disabled": false,
-          "autoApprove": []
-        }
-      }
-    }
-    ```
-
-    Replace `<your_shodan_api_key>` with your actual Shodan API key and `/path/to/shodan-mcp-server` with the actual path to the shodan-mcp-server directory.
-
-## Usage with Node.js
-
-You can use the MCP server with Node.js using the `@modelcontextprotocol/sdk` package.
-
-1.  Install the MCP SDK:
+2. Start the server:
 
     ```bash
-    npm install @modelcontextprotocol/sdk
+    node build/index.js
     ```
 
-2.  Use the `use_mcp_tool` function to call the tools:
+### Available Tools
 
-    ```javascript
-    import { use_mcp_tool } from '@modelcontextprotocol/sdk';
+1. **Search Tool**
+   - Query: Search for devices and services using Shodan's search syntax
+   - Example: `log4j country:US city:Atlanta`
+   - Returns: List of matching devices with detailed information
 
-    async function getIpInfo(ip) {
-      const result = await use_mcp_tool('shodan', 'get_ip_info', { ip });
-      console.log(result);
-    }
+2. **DNS Lookup Tool**
+   - Query: Domain name to resolve
+   - Example: `example.com`
+   - Returns: DNS records and related information
 
-    getIpInfo('8.8.8.8');
-    ```
+3. **CVE Info Tool**
+   - Query: CVE identifier
+   - Example: `CVE-2021-44228`
+   - Returns: Detailed vulnerability information
 
-## API Documentation
+### Example Queries
 
-### get\_ip\_info
-
-Get information about a specific IP address.
-
-**Input:**
-
-```json
+```javascript
+// Search for Log4j vulnerable systems in the US
 {
-  "ip": "string" // The IP address to query
+  "query": "log4j country:US"
+}
+
+// DNS lookup for a domain
+{
+  "query": "example.com"
+}
+
+// Get CVE information
+{
+  "query": "CVE-2021-44228"
 }
 ```
 
-**Output:**
+### Using the MCP Inspector
 
-A JSON object containing information about the IP address.
+You can use the MCP inspector to interact with the server directly:
 
-### dns\_lookup
-
-Perform DNS lookups for a given domain.
-
-**Input:**
-
-```json
-{
-  "hostname": "string" // The hostname to resolve
-}
+1. Install the MCP inspector:
+```bash
+npm install -g @modelcontextprotocol/inspector
 ```
 
-**Output:**
-
-A JSON object containing the resolved IP address.
-
-### get\_vulnerabilities
-
-Track vulnerabilities associated with a specific IP address.
-
-**Input:**
-
-```json
-{
-  "ip": "string" // The IP address to query for vulnerabilities
-}
+2. Run the inspector with your server:
+```bash
+npx @modelcontextprotocol/inspector build/index.js
 ```
 
-**Output:**
+The inspector provides an interactive interface to:
+- Test all available tools
+- View tool documentation
+- Debug server responses
+- Monitor server status
 
-A JSON object containing a list of vulnerabilities associated with the IP address.
+## Environment Variables
 
-### cve\_info
+- `SHODAN_API_KEY`: Your Shodan API key (required)
+- `PORT`: Server port (optional, defaults to 3000)
+- `LOG_LEVEL`: Logging level (optional, defaults to 'info')
 
-Retrieve information about a specific CVE ID.
+## Error Handling
 
-**Input:**
+The server implements comprehensive error handling for:
+- Invalid API keys
+- Rate limiting
+- Network issues
+- Invalid queries
+- Server errors
 
-```json
-{
-  "cve": "string" // The CVE ID to query
-}
-```
+## Security Considerations
 
-**Output:**
+1. API Key Protection:
+   - Never commit API keys to version control
+   - Use environment variables for sensitive data
+   - Rotate API keys regularly
 
-A JSON object containing information about the CVE ID.
+2. Rate Limiting:
+   - Respect Shodan's API rate limits
+   - Implement client-side rate limiting
 
-### search
+3. Data Privacy:
+   - Filter sensitive information from responses
+   - Implement access controls as needed
 
-Search Shodan for devices matching a query.
-
-**Input:**
-
-```json
-{
-  "query": "string" // The search query
-}
-```
-
-**Output:**
-
-A JSON object containing a list of devices matching the query.
-
-## Project Structure
-
-```
-shodan-mcp-server/
-├── .gitignore
-├── package.json
-├── README.md
-├── tsconfig.json
-└── src/
-    ├── index.ts
-    └── index.mts
-```
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Shodan for providing the API
+- Model Context Protocol team for the MCP specification
+

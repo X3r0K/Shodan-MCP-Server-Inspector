@@ -24,13 +24,19 @@ class ShodanServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-        name: 'shodan-mcp-server',
-        version: '0.1.0',
-        capabilities: {
-          resources: {},
-          tools: {},
-        },
+    const serverInfo = {
+      name: 'shodan-mcp-server',
+      version: '0.1.0',
+      capabilities: {
+        resources: {},
+        tools: {},
+      },
+    };
+
+    this.server = new Server(
+      serverInfo,
+      {
+        capabilities: serverInfo.capabilities
       }
     );
 
