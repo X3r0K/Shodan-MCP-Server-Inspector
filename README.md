@@ -26,7 +26,7 @@ This server implements the Model Context Protocol to expose Shodan's powerful in
 1. Clone the repository:
 
     ```bash
-    git clone [https://github.com/yourusername/shodan-mcp-server.git](https://github.com/X3r0K/Shodan-MCP-Server-Inspector.git)
+    git clone https://github.com/X3r0K/Shodan-MCP-Server-Inspector.git
     cd shodan-mcp-server-Inspector
     ```
 
